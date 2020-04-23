@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @Log
-public class Generator implements Runnable {
+public class Generator {
     private final SalePoints salePoints;
     private final AtomicInteger counter;
     private final String fileName;
@@ -26,34 +26,26 @@ public class Generator implements Runnable {
 
     public void generate() {
         Stream.generate(this::getRandomText)
+                .parallel()
                 .limit(count)
                 .forEach(string -> writeToFile(fileName, string));
     }
 
     private String getRandomText() {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        stringJoiner.add(RandomTimeGenerator.getRandomDate());
-        stringJoiner.add(RandomTimeGenerator.getRandomTime());
-        stringJoiner.add(salePoints.getRandomSalePoint());
-        stringJoiner.add(String.valueOf(counter.incrementAndGet()));
-        stringJoiner.add(RandomAmountGenerator.getRandomAmount());
-        stringJoiner.add("\n");
-
-        return stringJoiner.toString();
+        return new StringJoiner(" ")
+                .add(RandomTimeGenerator.getRandomDate())
+                .add(RandomTimeGenerator.getRandomTime())
+                .add(salePoints.getRandomSalePoint())
+                .add(String.valueOf(counter.incrementAndGet()))
+                .add(RandomAmountGenerator.getRandomAmount())
+                .add("\n").toString();
     }
 
     private void writeToFile(String fileName, String data) {
         try {
-            Files.write(Paths.get(fileName), data.getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(fileName), data.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new RuntimeException("Can't write to file " + e);
         }
-    }
-
-    @Override
-    public void run() {
-        log.info(">> " + Thread.currentThread().getName() + " start to generate lines");
-        generate();
-        log.info("<< " + Thread.currentThread().getName() + " generate " + counter.get() + " lines");
     }
 }

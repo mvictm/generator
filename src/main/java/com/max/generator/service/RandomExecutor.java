@@ -19,7 +19,7 @@ public class RandomExecutor {
     public static void execute(String[] args) {
         Validator.checkParams(args);
         initializeParams(args);
-        fileNames.forEach(fileName -> new Thread(new Generator(pathToSalePoints, fileName, countLines)).start());
+        fileNames.parallelStream().forEach(fileName -> new Generator(pathToSalePoints, fileName, countLines).generate());
     }
 
     private static void initializeParams(String[] args) {
