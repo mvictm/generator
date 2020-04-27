@@ -19,6 +19,6 @@ public class RandomTimeGenerator {
     }
 
     public static String getRandomDate() {
-        return LocalDate.ofEpochDay(ThreadLocalRandom.current().nextLong(START_EPOCH_DAY, END_EPOCH_DAY)).format(DateTimeFormatter.ofPattern("dd-M-yyyy"));
+        return LocalDate.ofEpochDay(ThreadLocalRandom.current().nextLong(START_EPOCH_DAY, END_EPOCH_DAY)).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }
